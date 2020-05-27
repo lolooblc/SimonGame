@@ -19,5 +19,5 @@ void LCDscreen::Display(char text[]){
 
 
 void LCDscreen::CleanScreen(){
-  noDisplay();
+  clear();
 }

@@ -1,9 +1,11 @@
 #include <Arduino.h> 
 #include "Game.h"
+#include <LiquidCrystal.h>
 
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 //Creation and initialisation of all the sensors
-LCDscreen MyLCD(rs, en, d4, d5, d6, d7);
+//LCDscreen MyLCD(rs, en, d4, d5, d6, d7);
 DigitalActuatorLED red_LED(pinLR);
 DigitalActuatorLED blue_LED(pinLB);
 DigitalActuatorLED green_LED(pinLG);
@@ -26,15 +28,18 @@ DigitalActuatorBuzzer buzzer_sonY(pinBuzzer, 4.0);
 Game::Game(){
   velocity = 500;
   error_spot = -1;
-  level = 1;
   //Initialisation of the LEDs
   red_LED.Write(0);
   blue_LED.Write(0);
   green_LED.Write(0);
   yellow_LED.Write(0);
+  lcd.begin(16, 2);
+  lcd.print("SIMON GAME");
 }
   
 const int Game::MAX_LEVEL=25;
+int Game::level=1;
+
 
 int * Game::generate_sequence(){
   randomSeed(millis());
@@ -48,6 +53,8 @@ int * Game::generate_sequence(){
 
 
 void Game::wrong_sequence(){
+  lcd.begin(16,2);
+  lcd.print("GAME OVER");
   for (int i = 0; i < 3; i++){
     red_LED.Write(1);
     blue_LED.Write(1);
@@ -61,7 +68,7 @@ void Game::wrong_sequence(){
     yellow_LED.Write(0);
     delay(250);
   }
-  //show_sequence(); //optional, show the right sequence at the end or not
+  lcd.clear();
   level = 1;
   velocity = 500;
   error_spot=-1;
@@ -69,6 +76,8 @@ void Game::wrong_sequence(){
 
 
 void Game::right_sequence(){
+  lcd.begin(16,2);
+  lcd.print("WELL DONE!");
   red_LED.Write(0);
   blue_LED.Write(0);
   green_LED.Write(0);
@@ -85,7 +94,7 @@ void Game::right_sequence(){
   green_LED.Write(0);
   yellow_LED.Write(0);
   delay(500);
-  
+  lcd.clear();
   if (level < MAX_LEVEL);{
     level++;
   }
@@ -93,17 +102,13 @@ void Game::right_sequence(){
 
 
 void Game::show_sequence(int *sequence){
+  lcd.noDisplay();
   red_LED.Write(0);
   blue_LED.Write(0);
   green_LED.Write(0);
   yellow_LED.Write(0);
-//  int *sequence;
-//  sequence=generate_sequence();
   for (int i = 0; i < level; i++){
-                                              //    if(error_spot==i){
-                                              //      MyLCD.Display("Erreur ici");
-                                              //      //beeplong = 640; //longest beep to show were was the error
-                                              //    }
+
     digitalWrite(sequence[i], HIGH);
     if (sequence[i]==pinLR){
       buzzer_sonR.ring();
@@ -120,15 +125,12 @@ void Game::show_sequence(int *sequence){
     delay(velocity);
     digitalWrite(sequence[i], LOW);
     delay(200);
-    //beeplong = 160;
   }
 }
 
 
 
 void Game::get_sequence(int *sequence){
-//  int *sequence;
-//  sequence=show_sequence();
   int your_sequence[MAX_LEVEL];
   int flag = 0; //this flag indicates if the sequence is correct
   
@@ -209,7 +211,7 @@ void Game::test_boutons(){
         red_LED.Write(1);
         delay(1000);
         red_LED.Write(0);
-        level++;
+        level=12;
       }
    if (blue_button.GetState() == 1){
         blue_LED.Write(1);

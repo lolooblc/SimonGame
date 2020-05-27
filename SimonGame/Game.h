@@ -23,7 +23,7 @@ class Game {
     int velocity;
     int error_spot;
     static const int MAX_LEVEL;
-    int level;
+    static int level;
   public:
     Game();  
     int * generate_sequence();
